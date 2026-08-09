@@ -1,0 +1,98 @@
+name: Build Cross Platform Flashlight
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Flutter platform files
+        working-directory: flutter_app
+        run: flutter create .
+
+      - name: Install dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Build Android APK
+        working-directory: flutter_app
+        run: flutter build apk --release
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: xolii-flashlight-android
+          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+
+  web:
+    name: Build Web App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Flutter platform files
+        working-directory: flutter_app
+        run: flutter create .
+
+      - name: Install dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Build Web
+        working-directory: flutter_app
+        run: flutter build web --release
+
+      - name: Upload Web App
+        uses: actions/upload-artifact@v4
+        with:
+          name: xolii-flashlight-web
+          path: flutter_app/build/web
+
+  ios:
+    name: Build iOS
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Flutter platform files
+        working-directory: flutter_app
+        run: flutter create .
+
+      - name: Install dependencies
+        working-directory: flutter_app
+        run: flutter pub get
+
+      - name: Build iOS
+        working-directory: flutter_app
+        run: flutter build ios --release --no-codesign
